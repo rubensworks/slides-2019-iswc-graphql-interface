@@ -45,28 +45,291 @@
     </section>
     
     <section id="start" class="slide">
-        <h2 class="big">Title</h2>
+        <h2 class="big">GraphQL interface:<br />API that handles GraphQL queries</h2>
+        <div style="float: left">
+            <p><strong>In</strong>:</p>
+            <pre class="indent">{
+  me {
+    name
+  }
+}</pre>
+        </div>
+        <div style="float: right">
+            <p><strong>Out</strong>:</p>
+            <pre class="indent">{
+  "data": {
+    "me": {
+      "name": "Luke Skywalker"
+    }
+  }
+}</pre>
+        </div>
+    </section>
+    
+    <section id="warning" class="slide">
+        <h2>Notes</h2>
         <ul>
-            <li>
-                TODO
-            </li>
-        </ul>
+            <li>Examples in JavaScript, similar in other languages</li>
+        </li>
     </section>
     
     <section id="index" class="slide index">
       <ul>
-        <li><a href="#index-a">A</a></li>
-        <li><a href="#index-b">B</a></li>
-        <li><a href="#index-c">C</a></li>
+        <li><a href="#index-inner">Inner workings</a></li>
+        <li><a href="#index-lowlevel">Low-level tools</a></li>
+        <li><a href="#index-highlevel">High-level tools</a></li>
       </ul>
     </section>
     
-    <section id="index-a" class="slide index">
+    <section id="index-requirements" class="slide index">
       <ul>
-        <li class="current"><a href="#index-a">A</a></li>
-        <li><a href="#index-b">B</a></li>
-        <li><a href="#index-c">C</a></li>
+        <li class="current"><a href="#index-inner">Inner workings</a></li>
+        <li><a href="#index-lowlevel">Low-level tools</a></li>
+        <li><a href="#index-highlevel">High-level tools</a></li>
       </ul>
+    </section>
+    
+    <section id="minimalrequirements" class="slide">
+        <h2>Minimal GraphQL interface requirements</h2>
+        <ul>
+            <li>
+                <h3>GraphQL Schema</h3>
+                <p class="indent">describes what data can be queried</p>
+            </li>
+            <li>
+                <h3>Resolvers</h3>
+                <p class="indent">retrieves data for specific fields</p>
+            </li>
+            <li>
+                <h3>Query Engine</h3>
+                <p class="indent">executes full GraphQL queries</p>
+            </li>
+        </ul>
+    </section>
+    
+    <section id="req-schema" class="slide">
+        <h2>GraphQL Schemas<br />describe what data can be queried</h2>
+        <ul>
+            <li>Independent of any specific backend framework or programming language.</li>
+            <li>Defines all resolvable types, and their fields.</li>
+            <li><code>Query</code> type defines all query entrypoints.</li>
+            <li>Example: 
+                <pre class="indent">type Query {
+  me: User
+}
+
+type User {
+  id: ID
+  name: String
+}</pre>
+            </li>
+        </ul>
+    </section>
+    
+    <section id="req-resolvers" class="slide">
+        <h2>Resolvers retrieve data for specific fields</h2>
+        <ul>
+            <li>Programmatic resolvers provide the link between schema fields and data.</li>
+            <li>
+                Function signature: <code>function(parent, args, context, info)</code>
+                <ul>
+                    <li><code>parent</code>: Resolver result from parent field, or root value.</li>
+                    <li><code>args</code>: Arguments passed to the field. (e.g. <code>{ key: "value" }</code>)</li>
+                    <li><code>context</code>: Object shared by resolvers per request <em>(e.g. authentication)</em></li>
+                    <li><code>info</code>: Query execution state <em>(e.g. field name, path)</em></li>
+                </ul>
+            </li>
+            <li>Return type must correspond to GraphQL schema type.</li>
+            <li>Can optionally return a <em>promise</em> for asynchronous actions.</li>
+            <li>Example: 
+                <pre class="indent">function User_name(user) { return user.getName(); }</pre>
+            </li>
+        </ul>
+    </section>
+    
+    <section id="req-engine" class="slide">
+        <h2>Query Engines execute full queries</h2>
+        <ul>
+            <li>Constructed with <em>GraphQL schema</em> and <em>resolvers</em>.</li>
+            <li>Accepts GraphQL queries, and outputs results.</li>
+            <li>
+                Steps:
+                <ol>
+                    <li><em>Parse</em> query into an abstract syntax tree (AST).</li>
+                    <li><em>Validate</em> AST against the schema.</li>
+                    <li><em>Execute</em> by walking through the AST and invoking resolvers.</li>
+                </ol>
+            </li>
+        </ul>
+    </section>
+    
+    <section id="execute-example-parse" class="slide">
+        <h2>Query Execution Step 1: Parsing</h2>
+        <div style="float: left">
+            <p><strong>GraphQL Query</strong>:</p>
+            <pre class="indent">query {
+  hero {
+    name
+    friends {
+      name
+    }
+  }
+}</pre>
+        </div>
+        <div style="float: right; width: 400px">
+            <p><strong>AST</strong>:</p>
+            <img src="img/ast.svg" />
+        </div>
+    </section>
+    
+    <section id="execute-example-validate" class="slide">
+        <h2>Query Execution Step 2: Validation</h2>
+        <div style="float: left">
+            <p><strong>GraphQL Schema</strong>:</p>
+            <pre class="indent">type Query {
+  hero: Character
+}
+
+type Character {
+  name: String!
+  friends: [Character]
+}</pre>
+        </div>
+        <div style="float: right">
+        <p><strong>Validation steps</strong>:</p>
+            <ul>
+                <li><code>hero</code> in <code>Query</code>?</li>
+                <li><code>name</code> in <code>Character</code>?</li>
+                <li><code>friends</code> in <code>Character</code>?</li>
+                <li><code>name</code> in <code>Character</code>?</li>
+            </ul>
+        </div>
+        <div style="float: right">
+            <p><strong>AST</strong>:</p>
+            <img src="img/ast.svg" />
+        </div>
+    </section>
+    
+    <section id="execute-example-execute-0" class="slide">
+        <h2>Query Execution Step 3: Execution</h2>
+        <div style="float: left">
+            <p><strong>Resolvers</strong>:</p>
+            <pre>{
+ Query: {
+  hero: () =>
+    db.findAll('hero'),
+ },
+ Character: {
+  name: (char) =>
+    db.find('name', char),
+  friends: (char) =>
+    db.findAll('friend', char),
+ }
+}</pre>
+        </div>
+        
+        <div style="float: right">
+            <p><strong>AST</strong>:</p>
+            <img src="img/ast.svg" />
+        </div>
+    </section>
+    
+    <section id="execute-example-execute-1" class="slide">
+        <h2>Query Execution Step 3: Execution - L1</h2>
+        <div style="float: left">
+            <p><strong>Resolvers</strong>:</p>
+            <pre>{
+ <strong>Query: {
+   hero: () =>
+     db.findAll('hero'),
+  },</strong>
+ Character: {
+  name: (char) =>
+    db.find('name', char),
+  friends: (char) =>
+    db.findAll('friend', char),
+ }
+}</pre>
+        </div>
+        <div style="float: right">
+            <p><strong>AST</strong>:</p>
+            <img src="img/ast.svg" />
+        </div>
+        <p style="clear: both; position:relative; top: -20px"><strong>&rarr;</strong> <code>[1,2]</code></p>
+    </section>
+    
+    <section id="execute-example-execute-2" class="slide">
+        <h2>Query Execution Step 3: Execution - L2</h2>
+        <div style="float: left">
+            <p><strong>Resolvers</strong>:</p>
+            <pre>{
+ Query: {
+   hero: () =>
+     db.findAll('hero'),
+  },
+ Character: {
+ <strong> name: (char) =>
+     db.find('name', char),
+  friends: (char) =>
+    db.findAll('friend', char),</strong>
+ }
+}</pre>
+        </div>
+        <div style="float: right">
+            <p><strong>AST</strong>:</p>
+            <img src="img/ast.svg" />
+        </div>
+        <p style="clear: both; position:relative; top: -20px"><strong>&rarr;</strong> <code>[{name:'Luke',friends:[2]},{name:'Leia',friends:[1]}]</code></p>
+    </section>
+    
+    <section id="execute-example-execute-2" class="slide">
+        <h2>Query Execution Step 3: Execution - L3</h2>
+        <div style="float: left">
+            <p><strong>Resolvers</strong>:</p>
+            <pre>{
+ Query: {
+   hero: () =>
+     db.findAll('hero'),
+  },
+ Character: {
+ <strong> name: (char) =>
+     db.find('name', char),</strong>
+  friends: (char) =>
+    db.findAll('friend', char),
+ }
+}</pre>
+        </div>
+        <div style="float: right">
+            <p><strong>AST</strong>:</p>
+            <img src="img/ast.svg" />
+        </div>
+        <p style="clear: both; position:relative; top: -20px"><strong>&rarr;</strong> <code>[{name:'Luke',friends:[...]},{name:'Leia',friends:[...]}]</code></p>
+    </section>
+    
+    <section id="index-lowlevel" class="slide index">
+      <ul>
+        <li><a href="#index-inner">Inner workings</a></li>
+        <li class="current"><a href="#index-lowlevel">Low-level tools</a></li>
+        <li><a href="#index-highlevel">High-level tools</a></li>
+      </ul>
+    </section>
+    
+    <section id="index-highlevel" class="slide index">
+      <ul>
+        <li><a href="#index-inner">Inner workings</a></li>
+        <li><a href="#index-lowlevel">Low-level tools</a></li>
+        <li class="current"><a href="#index-highlevel">High-level tools</a></li>
+      </ul>
+    </section>
+    
+    <section id="sources" class="slide">
+        <h2>Sources</h2>
+        <ul>
+            <li>GraphQL.org: <a href="https://graphql.org/learn/schema/">https://graphql.org/learn/</a></li>
+            <li>How to GraphQL: <a href="https://www.howtographql.com/advanced/1-server/">https://www.howtographql.com/advanced/1-server/</a></li>
+            <li>Apollo documentation: <a href="https://www.apollographql.com/docs/apollo-server/essentials/data">https://www.apollographql.com/docs/apollo-server/essentials/data</a></li>
+            <li>PayPal GraphQL resolvers best practises: <a href="https://medium.com/paypal-engineering/graphql-resolvers-best-practices-cd36fdbcef55">https://medium.com/paypal-engineering/graphql-resolvers-best-practices-cd36fdbcef55</a></li>
+        </ul>
     </section>
 
     <footer>
