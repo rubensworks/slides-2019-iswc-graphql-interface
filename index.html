@@ -314,6 +314,60 @@ type Character {
       </ul>
     </section>
     
+    <section id="graphqljs" class="slide">
+        <h2><a href="https://github.com/graphql/graphql-js">GraphQL.js</a><br />is the official reference implementation</h2>
+        <div class="next">
+            <p>It includes:</p>
+            <ul>
+                <li>GraphQL query parser</li>
+                <li>GraphQL schema and resolver datastructures</li>
+                <li>GraphQL query engine</li>
+            </ul>
+        </div>
+        <div class="next">
+            <p>It does not include:</p>
+            <ul>
+                <li>Resolvers for specific data backends</li>
+                <li>HTTP service (<em>and GraphiQL</em>)</li>
+                <li>Query optimization</li>
+            </ul>
+        </div>
+    </section>
+    
+    <section id="graphqljs-example" class="slide">
+        <h2><code>graphql</code> parses, validates, and executes</h2>
+        <p>Schema and resolvers are combined in a single datastructure.</p>
+        <pre>const schema = new GraphQLSchema({
+  query: new GraphQLObjectType({
+    name: 'RootQueryType',
+    fields: {
+      hello: {
+        type: GraphQLString,
+        resolve() {
+          return 'world';
+        }
+      }
+    }
+  })
+});
+
+const result = await graphql(schema, '{ hello }');</pre>
+    </section>
+    
+    <section id="express-graphql" class="slide">
+        <h2><a href="https://github.com/graphql/express-graphql"><code>express-graphql</code></a><br />offers a GraphQL HTTP server</h2>
+       <ul>
+           <li>Middleware layer for HTTP Web frameworks. (Connect, Express, Restify, ...)</li>
+           <li>Accepts queries via HTTP, and responds with query results.</li>
+           <li>Optional GraphiQL support.</li>
+       </ul>
+       <p>Express example:</p>
+       <pre>app.use('/graphql', graphqlHTTP({
+  schema: MyGraphQLSchema,
+  graphiql: true
+}));</pre>
+    </section>
+    
     <section id="index-highlevel" class="slide index">
       <ul>
         <li><a href="#index-inner">Inner workings</a></li>
