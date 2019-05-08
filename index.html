@@ -415,6 +415,11 @@ server.listen().then(({ url }) => {
 });</pre>
     </section>
     
+    <section id="apollo-server-extensible" class="slide">
+        <h2 class="big" style="margin-top: 3em">The Apollo Server is extensible</h2>
+        <p>data sources, caching, authentication, subscriptions, testing, ...</p>
+    </section>
+    
     <section id="apollo-server-datasources" class="slide">
         <h2>Apollo Server can abstract data fetching<br />with Data sources</h2>
         <p>Data sources are abstractions for data fetching from specific services.</p>
@@ -530,11 +535,40 @@ const resolvers = {
         <p>Apollo is the most popular platform, used by Airbnb, Twitch, Medium, ...</p>
         <ul>
            <li><a href="https://github.com/prisma/graphql-yoga">Yoga</a>: GraphQL server in JavaScript</li>
-           <li><a href="https://github.com/prisma/graphql-yoga">Yoga</a>: GraphQL server in JavaScript</li>
            <li><a href="https://github.com/prisma/yoga2">Yoga 2</a>: GraphQL server in JavaScript similar to Ruby on Rails</li>
            <li><a href="https://github.com/FormidableLabs/urql">urql</a>: GraphQL client for React</li>
            <li><a href="https://github.com/facebook/relay">Relay</a>: On of the first GraphQL clients for React</li>
            <li><em>More: <a href="https://github.com/chentsulin/awesome-graphql">https://github.com/chentsulin/awesome-graphql</a></em></li>
+        </ul>
+    </section>
+    
+    <section id="index-final" class="slide index">
+      <ul>
+        <li><a href="#index-inner">Inner workings</a></li>
+        <li><a href="#index-lowlevel">Low-level tools</a></li>
+        <li><a href="#index-highlevel">High-level tools</a></li>
+      </ul>
+    </section>
+    
+    <section id="conclusions" class="slide">
+        <h2>In Summary</h2>
+        <ul>
+            <li>
+                <h3>A GraphQL interface is an API</h3>
+                <p class="indent">It accepts GraphQL queries and returns JSON results</p>
+            </li>
+            <li>
+                <h3>GraphQL interfaces are based on three components</h3>
+                <p class="indent"><em>GraphQL schema</em>, <em>Resolvers</em>, and a <em>Query Engine</em></p>
+            </li>
+            <li>
+                <h3>GraphQL.js is the official reference implementation</h3>
+                <p class="indent">It enables GraphQL querying in code (<code>graphql-express</code> for HTTP interface)</p>
+            </li>
+            <li>
+                <h3>Third-party GraphQL platforms offer features for advanced interfaces</h3>
+                <p class="indent">Commercial tools such as Apollo, Yoga, ...</p>
+            </li>
         </ul>
     </section>
     
