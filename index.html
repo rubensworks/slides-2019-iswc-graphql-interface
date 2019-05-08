@@ -376,13 +376,181 @@ const result = await graphql(schema, '{ hello }');</pre>
       </ul>
     </section>
     
+    <section id="intro-apollo" class="slide">
+        <h2>Apollo: a fully-featured GraphQL platform</h2>
+        <p><img src="img/apollo.png" alt="Apollo" width="50%" style="float: right" /></p>
+        <p><strong>Main features</strong>:</p>
+        <ul>
+           <li>Apollo Server: GraphQL server (JS)</li>
+           <li>Apollo Client: GraphQL client (JS)</li>
+           <li>Schema Registry: central repo for schemas + metadata (<em>e.g. field usage stats</em>)</li>
+           <li><a href="https://www.apollographql.com/docs/platform/editor-plugins">IDE Plugin</a>: VS Code</li>
+           <li>Operation Registry (+): central repo for schema operations</li>
+           <li>Execution Gateway (++): federation service</li>
+           <li>Trace Warehouse (+): collects statistics on executed queries on server</li>
+        </ul>
+        <p><em>(+): Team plan; (++): Enterprise plan</em></p>
+    </section>
+    
+    <section id="apollo-server-code" class="slide">
+        <h2>Setting up an interface with Apollo Server</h2>
+        <pre>const typeDefs = gql`
+  type Book {
+    title: String
+    author: String
+  }
+  type Query {
+    books: [Book]
+  }
+`;
+const resolvers = {
+  Query: {
+    books: () => ...,
+  },
+};
+
+const server = new ApolloServer({ typeDefs, resolvers });
+server.listen().then(({ url }) => {
+  console.log(`🚀  Server ready at ${url}`);
+});</pre>
+    </section>
+    
+    <section id="apollo-server-datasources" class="slide">
+        <h2>Apollo Server can abstract data fetching<br />with Data sources</h2>
+        <p>Data sources are abstractions for data fetching from specific services.</p>
+        <p>Built-in support for caching, result deduplication, and error handling.</p>
+        <pre>class MoviesAPI extends RESTDataSource {
+  constructor() {
+    super();
+    this.baseURL = 'https://movies-api.example.com/';
+  }
+
+  async getMovie(id) {
+    return this.get(`movies/${id}`);
+  }
+}</pre>
+    </section>
+    
+    <section id="apollo-server-datasources-usage" class="slide">
+        <h2>Data sources can be used in resolvers</h2>
+        <p>Data sources must be configured in server.</p>
+        <p>Resolvers can access data sources from context.</p>
+        <pre>const server = new ApolloServer({
+  ...
+  dataSources: () => { return { moviesAPI: new MoviesAPI() }; },
+});
+
+const resolvers = {
+  Query: {
+    movie: async (source, { id }, { dataSources }) => {
+      return dataSources.moviesAPI.getMovie(id);
+    },
+  },
+};
+</pre>
+    </section>
+    
+    <section id="apollo-server-cache" class="slide">
+        <h2>Apollo Server has built-in caching</h2>
+        <p>Resources are by default cached with an in-memory LRU cache.</p>
+        <p>Alternative caches can be configured, such as Memcached or Redis</p>
+        <pre>const { MemcachedCache } = require('apollo-server-cache-memcached');
+
+const server = new ApolloServer({
+  ...
+  cache: new MemcachedCache(
+    ['memcached-server-1', 'memcached-server-2'],
+    { retries: 10, retry: 10000 }, // Options
+  ),
+});</pre>
+    </section>
+    
+    <section id="apollo-server-authentication" class="slide">
+        <h2>Apollo Server can handle<br />authenticated requests</h2>
+        <p>HTTP authorization headers can be placed into the context.</p>
+        <pre>const server = new ApolloServer({
+  ...
+  context: ({ req }) => {
+     const token = req.headers.authorization || '';
+     const user = getUser(token);
+     return { user };
+   },
+});</pre>
+    </section>
+    
+    <section id="apollo-server-subscriptions" class="slide">
+        <h2>Apollo Server event subscriptions</h2>
+        <p>Different publish and subscribe primitives: PubSub, WebSocket</p>
+        <pre>const typeDefs = gql`
+  type Subscription {
+    postAdded: Post
+  }
+  type Post {
+    author: String
+    comment: String
+  }`
+const resolvers = {
+  Subscription: {
+    postAdded: {
+      subscribe: () => pubsub.asyncIterator(['POST_ADDED']),
+      // emit with pubsub.publish('POST_ADDED', { postAdded:args });
+    },
+  },
+};
+</pre>
+    </section>
+    
+    <section id="apollo-server-testing" class="slide">
+        <h2>Apollo Server provides testing utilities</h2>
+        <p>Mocks the request pipeline and HTTP server</p>
+        <p>Allows testing of schema, resolvers and datasources</p>
+        <pre>it('fetches single launch', async () => {
+  const { query } = createTestClient(server);
+  const res = await query({ query: '...', variables: { id: 1 } });
+  expect(res).toMatchSnapshot();
+</pre>
+    </section>
+    
+    <section id="why-apollo" class="slide">
+        <h2>When to use Apollo over GraphQL.js?</h2>
+        <p>Apollo has</p>
+        <ul>
+           <li>Better developer experience (client and server)</li>
+           <li>Support for more advanced server back-ends</li>
+           <li>Registries that can be reused by multiple interfaces (+)</li>
+           <li>Detailed logging of query executions (+)</li>
+           <li>Service level agreements (++)</li>
+           <li>Federated query service when multiple interfaces must be combined (++)</li>
+        </ul>
+        <p><em>(+): Team plan; (++): Enterprise plan</em></p>
+    </section>
+    
+    <section id="apollo-alternatives" class="slide">
+        <h2>Apollo GraphQL Platform Alternatives</h2>
+        <p>Apollo is the most popular platform, used by Airbnb, Twitch, Medium, ...</p>
+        <ul>
+           <li><a href="https://github.com/prisma/graphql-yoga">Yoga</a>: GraphQL server in JavaScript</li>
+           <li><a href="https://github.com/prisma/graphql-yoga">Yoga</a>: GraphQL server in JavaScript</li>
+           <li><a href="https://github.com/prisma/yoga2">Yoga 2</a>: GraphQL server in JavaScript similar to Ruby on Rails</li>
+           <li><a href="https://github.com/FormidableLabs/urql">urql</a>: GraphQL client for React</li>
+           <li><a href="https://github.com/facebook/relay">Relay</a>: On of the first GraphQL clients for React</li>
+           <li><em>More: <a href="https://github.com/chentsulin/awesome-graphql">https://github.com/chentsulin/awesome-graphql</a></em></li>
+        </ul>
+    </section>
+    
     <section id="sources" class="slide">
         <h2>Sources</h2>
-        <ul>
+        <ul style="font-size: 0.7em">
             <li>GraphQL.org: <a href="https://graphql.org/learn/schema/">https://graphql.org/learn/</a></li>
             <li>How to GraphQL: <a href="https://www.howtographql.com/advanced/1-server/">https://www.howtographql.com/advanced/1-server/</a></li>
             <li>Apollo documentation: <a href="https://www.apollographql.com/docs/apollo-server/essentials/data">https://www.apollographql.com/docs/apollo-server/essentials/data</a></li>
             <li>PayPal GraphQL resolvers best practises: <a href="https://medium.com/paypal-engineering/graphql-resolvers-best-practices-cd36fdbcef55">https://medium.com/paypal-engineering/graphql-resolvers-best-practices-cd36fdbcef55</a></li>
+            <li>Apollo Docs: Create server: <a href="https://www.apollographql.com/docs/apollo-server/getting-started#step-3-create-the-server">https://www.apollographql.com/docs/apollo-server/getting-started#step-3-create-the-server</a></li>
+            <li>Apollo Docs: Data sources: <a href="https://www.apollographql.com/docs/apollo-server/features/data-sources">https://www.apollographql.com/docs/apollo-server/features/data-sources</a></li>
+            <li>Apollo Docs: Caching: <a href="https://www.apollographql.com/docs/apollo-server/features/data-sources#using-memcachedredis-as-a-cache-storage-backend">https://www.apollographql.com/docs/apollo-server/features/data-sources#using-memcachedredis-as-a-cache-storage-backend</a></li>
+            <li>Apollo Docs: Authentication: <a href="https://www.apollographql.com/docs/apollo-server/features/authentication">https://www.apollographql.com/docs/apollo-server/features/authentication</a></li>
+            <li>Apollo Docs: Subscriptions: <a href="https://www.apollographql.com/docs/apollo-server/features/subscriptions">https://www.apollographql.com/docs/apollo-server/features/subscriptions</a></li>
+            <li>Apollo Docs: Testing: <a href="https://www.apollographql.com/docs/apollo-server/features/testing">https://www.apollographql.com/docs/apollo-server/features/testing</a></li>
         </ul>
     </section>
 
