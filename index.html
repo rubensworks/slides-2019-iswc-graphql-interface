@@ -142,7 +142,7 @@ type User {
             <li>Return type must correspond to GraphQL schema type.</li>
             <li>Can optionally return a <em>promise</em> for asynchronous actions.</li>
             <li>Example: 
-                <pre class="indent">function User_name(user) { return user.getName(); }</pre>
+                <pre class="indent">const hero = (_, args) => db.find('hero', { name: args.name });</pre>
             </li>
         </ul>
     </section>
@@ -537,7 +537,7 @@ const resolvers = {
            <li><a href="https://github.com/prisma/graphql-yoga">Yoga</a>: GraphQL server in JavaScript</li>
            <li><a href="https://github.com/prisma/yoga2">Yoga 2</a>: GraphQL server in JavaScript similar to Ruby on Rails</li>
            <li><a href="https://github.com/FormidableLabs/urql">urql</a>: GraphQL client for React</li>
-           <li><a href="https://github.com/facebook/relay">Relay</a>: On of the first GraphQL clients for React</li>
+           <li><a href="https://github.com/facebook/relay">Relay</a>: One of the first GraphQL clients for React</li>
            <li><em>More: <a href="https://github.com/chentsulin/awesome-graphql">https://github.com/chentsulin/awesome-graphql</a></em></li>
         </ul>
     </section>
