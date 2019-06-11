@@ -142,7 +142,7 @@ type User {
             <li>Return type must correspond to GraphQL schema type.</li>
             <li>Can optionally return a <em>promise</em> for asynchronous actions.</li>
             <li>Example: 
-                <pre class="indent">function User_name(user) { return user.getName(); }</pre>
+                <pre class="indent">const hero = (_, args) => db.find('hero', { name: args.name });</pre>
             </li>
         </ul>
     </section>
