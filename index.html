@@ -381,8 +381,8 @@ const result = await graphql(schema, '{ hello }');</pre>
         <p><img src="img/apollo.png" alt="Apollo" width="50%" style="float: right" /></p>
         <p><strong>Main features</strong>:</p>
         <ul>
-           <li>Apollo Server: GraphQL server (JS)</li>
            <li>Apollo Client: GraphQL client (JS)</li>
+           <li><strong>Apollo Server: GraphQL server (JS)</strong></li>
            <li>Schema Registry: central repo for schemas + metadata (<em>e.g. field usage stats</em>)</li>
            <li><a href="https://www.apollographql.com/docs/platform/editor-plugins">IDE Plugin</a>: VS Code</li>
            <li>Operation Registry (+): central repo for schema operations</li>
@@ -513,6 +513,7 @@ const resolvers = {
   const { query } = createTestClient(server);
   const res = await query({ query: '...', variables: { id: 1 } });
   expect(res).toMatchSnapshot();
+}
 </pre>
     </section>
     
@@ -531,13 +532,11 @@ const resolvers = {
     </section>
     
     <section id="apollo-alternatives" class="slide">
-        <h2>Apollo GraphQL Platform Alternatives</h2>
+        <h2>GraphQL Server Alternatives</h2>
         <p>Apollo is the most popular platform, used by Airbnb, Twitch, Medium, ...</p>
         <ul>
            <li><a href="https://github.com/prisma/graphql-yoga">Yoga</a>: GraphQL server in JavaScript</li>
            <li><a href="https://github.com/prisma/yoga2">Yoga 2</a>: GraphQL server in JavaScript similar to Ruby on Rails</li>
-           <li><a href="https://github.com/FormidableLabs/urql">urql</a>: GraphQL client for React</li>
-           <li><a href="https://github.com/facebook/relay">Relay</a>: One of the first GraphQL clients for React</li>
            <li><em>More: <a href="https://github.com/chentsulin/awesome-graphql">https://github.com/chentsulin/awesome-graphql</a></em></li>
         </ul>
     </section>
